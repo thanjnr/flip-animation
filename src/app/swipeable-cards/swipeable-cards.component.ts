@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Inject } from '@angular/core';
 
 @Component({
   selector: 'app-swipeable-cards',
@@ -7,7 +7,9 @@ import { Component, OnInit, AfterViewInit } from '@angular/core';
 })
 export class SwipeableCardsComponent implements OnInit, AfterViewInit {
 
-  constructor() { }
+  constructor(@Inject('Flipping') public Flipping: any,
+  @Inject('Hammer') public Hammer: any,
+  @Inject('RxCSS') public RxCSS: any) { }
 
   ngOnInit() {
 

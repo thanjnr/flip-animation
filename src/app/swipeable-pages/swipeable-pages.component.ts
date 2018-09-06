@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit, ViewChild, ViewChildren, AfterViewInit } from '@angular/core';
-import { Observable, fromEvent, Scheduler, interval, fromEventPattern, merge } from 'rxjs';
+import { Scheduler, interval, fromEventPattern, merge } from 'rxjs';
 import { map, startWith, scan, share } from 'rxjs/operators';
 import { AppState } from '../app-state';
 

@@ -5,6 +5,9 @@
     max-width: 450px;
     padding: 16px;
     margin: 0 auto;
+    font-family: Arial;
+    font-size: 30px;
+    color: #333;
   }
   
   .card {
