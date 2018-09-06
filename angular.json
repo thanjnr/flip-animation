@@ -25,7 +25,11 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [
+              "./node_modules/flipping/dist/flipping.js",
+              "./node_modules/hammerjs/hammer.min.js",
+              "./node_modules/rxcss/dist/rxcss.min.js"
+            ]
           },
           "configurations": {
             "production": {

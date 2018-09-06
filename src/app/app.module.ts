@@ -10,7 +10,11 @@ import { AppComponent } from './app.component';
   imports: [
     BrowserModule
   ],
-  providers: [],
+  providers: [
+    { provide: 'Flipping', useValue: window['Flipping'] },
+    { provide: 'RxCSS', useValue: window['RxCSS'] },
+    { provide: 'Hammer', useValue: window['Hammer'] }
+],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
