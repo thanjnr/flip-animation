@@ -1,7 +1,7 @@
 import { Component, OnInit, Inject, AfterViewInit, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { interval, Scheduler, fromEvent } from 'rxjs';
 import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
-import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil } from 'rxjs/operators';
+import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-rxjs-drag',
@@ -33,7 +33,10 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
     location$.pipe(
       map(([x, y]) => ({
         moveElLocation: [x, y] as [any, any]
-      }))
+      })),
+      distinctUntilChanged((a, b) => a.moveElLocation[0] === b.moveElLocation[0] &&
+      a.moveElLocation[1] === b.moveElLocation[1]
+      )
     )
       .subscribe(({ moveElLocation }) => {
         this.zone.runOutsideAngular(() => {
