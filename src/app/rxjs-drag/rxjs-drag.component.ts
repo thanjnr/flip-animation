@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, AfterViewInit, NgZone } from '@angular/core';
+import { Component, OnInit, Inject, AfterViewInit, NgZone, ViewChild, ElementRef } from '@angular/core';
 import { interval, Scheduler, fromEvent } from 'rxjs';
 import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
 import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil } from 'rxjs/operators';
@@ -9,8 +9,11 @@ import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil } fr
   styleUrls: ['./rxjs-drag.component.css']
 })
 export class RxjsDragComponent implements OnInit, AfterViewInit {
+  @ViewChild('justmove') circle: ElementRef;
   VIEWBOX_SIZE = { W: 600, H: 600 };
   animationFrame$ = interval(0, animationFrame);
+  x: 0;
+  y: 0;
 
   constructor(private zone: NgZone,
     @Inject('Flipping') public Flipping: any,
@@ -25,20 +28,20 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
     // Dom nodes
     let moveEl = document.querySelector("#js-move");
     console.log(moveEl);
-    this.zone.runOutsideAngular(() => {
-      const location$ = this.handleDrag(moveEl).pipe(startWith([200, 300]));
+    const location$ = this.handleDrag(moveEl).pipe(startWith([200, 300]));
 
-      location$.pipe(
-        map(([x, y]) => ({
-          moveElLocation: [x, y] as [any, any]
-        }))
-      )
-        .subscribe(({ moveElLocation }) => {
+    location$.pipe(
+      map(([x, y]) => ({
+        moveElLocation: [x, y] as [any, any]
+      }))
+    )
+      .subscribe(({ moveElLocation }) => {
+        this.zone.runOutsideAngular(() => {
           console.log('moving...');
           this.moveTo(moveElLocation, moveEl);
-        });
-    });
-  }  
+        });       
+      });
+  }
 
   /**
    * Generate the drag handler for a DOM element
@@ -148,8 +151,11 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
     };
   }
 
-  moveTo([x, y], element) {
-    element.setAttribute("cx", x);
-    element.setAttribute("cy", y);
+  moveTo([x, y], element) { 
+    
+    this.circle.nativeElement.setAttribute("cx", x);
+    this.circle.nativeElement.setAttribute("cy",y);
+    /* element.setAttribute("cx", x);
+    element.setAttribute("cy", y); */
   }
 }
