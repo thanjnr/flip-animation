@@ -9,7 +9,8 @@ import { RxjsDragComponent } from './rxjs-drag/rxjs-drag.component';
 
 export const appRoutes: Routes = [
   { path: 'swipe-card', component: SwipeableCardsComponent },
-  { path: 'swipe-page', component: SwipeablePagesComponent }
+  { path: 'swipe-page', component: SwipeablePagesComponent },
+  { path: 'drag-rx', component: RxjsDragComponent }
 ];
 
 @NgModule({
