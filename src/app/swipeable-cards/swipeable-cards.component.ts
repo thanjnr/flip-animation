@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit, Inject } from '@angular/core';
+import { Observable, fromEvent } from 'rxjs';
 
 @Component({
   selector: 'app-swipeable-cards',
@@ -7,21 +8,6 @@ import { Component, OnInit, AfterViewInit, Inject } from '@angular/core';
 })
 export class SwipeableCardsComponent implements OnInit, AfterViewInit {
 
-  constructor(@Inject('Flipping') public Flipping: any,
-  @Inject('Hammer') public Hammer: any,
-  @Inject('RxCSS') public RxCSS: any) { }
-
-  ngOnInit() {
-
-  }
-
-  ngAfterViewInit() {
-    new Cards();
-  }
-
-}
-
-export class Cards {
   cards;
   targetBCR = null;
   target = null;
@@ -31,7 +17,10 @@ export class Cards {
   targetX = 0;
   draggingCard = false;
 
-  constructor () {
+  constructor(@Inject('Flipping') public Flipping: any,
+    @Inject('Hammer') public Hammer: any,
+    @Inject('RxCSS') public RxCSS: any) {
+
     this.cards = Array.from(document.querySelectorAll('.card'));
 
     this.onStart = this.onStart.bind(this);
@@ -51,7 +40,24 @@ export class Cards {
     requestAnimationFrame(this.update);
   }
 
-  addEventListeners () {
+  ngOnInit() {
+
+  }
+
+  ngAfterViewInit() {
+  }
+
+  addEventListeners() {
+    // Create a new Hammer Manager
+    const hammerPan = new this.Hammer(document, {
+      direction: this.Hammer.DIRECTION_ALL,
+    });
+
+    hammerPan.get('pan').set({ direction: this.Hammer.DIRECTION_ALL });
+
+    // Convert hammer events to an observable
+    const pan$ = fromEvent(hammerPan, 'panstart panmove panend');
+
     document.addEventListener('touchstart', this.onStart);
     document.addEventListener('touchmove', this.onMove);
     document.addEventListener('touchend', this.onEnd);
@@ -61,7 +67,7 @@ export class Cards {
     document.addEventListener('mouseup', this.onEnd);
   }
 
-  onStart (evt) {
+  onStart(evt) {
     if (this.target)
       return;
 
@@ -80,14 +86,14 @@ export class Cards {
     evt.preventDefault();
   }
 
-  onMove (evt) {
+  onMove(evt) {
     if (!this.target)
       return;
 
     this.currentX = evt.pageX || evt.touches[0].pageX;
   }
 
-  onEnd (evt) {
+  onEnd(evt) {
     if (!this.target)
       return;
 
@@ -96,14 +102,14 @@ export class Cards {
     const threshold = this.targetBCR.width * 0.35;
     if (Math.abs(screenX) > threshold) {
       this.targetX = (screenX > 0) ?
-           this.targetBCR.width :
-          -this.targetBCR.width;
+        this.targetBCR.width :
+        -this.targetBCR.width;
     }
 
     this.draggingCard = false;
   }
 
-  update () {
+  update() {
 
     requestAnimationFrame(this.update);
 
@@ -117,7 +123,7 @@ export class Cards {
     }
 
     const normalizedDragDistance =
-        (Math.abs(this.screenX) / this.targetBCR.width);
+      (Math.abs(this.screenX) / this.targetBCR.width);
     const opacity = 1 - Math.pow(normalizedDragDistance, 3);
 
     this.target.style.transform = `translateX(${this.screenX}px)`;
@@ -150,7 +156,7 @@ export class Cards {
     }
   }
 
-  animateOtherCardsIntoPosition (startIndex) {
+  animateOtherCardsIntoPosition(startIndex) {
     // If removed card was the last one, there is nothing to animate.
     // Remove the target.
     if (startIndex === this.cards.length) {
@@ -182,13 +188,13 @@ export class Cards {
         const card = this.cards[i];
 
         // Move the card down then slide it up, with delay according to "distance"
-        card.style.transition = `transform 150ms cubic-bezier(0,0,0.31,1) ${i*50}ms`;
+        card.style.transition = `transform 150ms cubic-bezier(0,0,0.31,1) ${i * 50}ms`;
         card.style.transform = '';
       }
     });
   }
 
-  resetTarget () {
+  resetTarget() {
     if (!this.target)
       return;
 
@@ -196,4 +202,5 @@ export class Cards {
     this.target.style.transform = 'none';
     this.target = null;
   }
+
 }

@@ -5,6 +5,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AppComponent } from './app.component';
 import { SwipeableCardsComponent } from './swipeable-cards/swipeable-cards.component';
 import { SwipeablePagesComponent } from './swipeable-pages/swipeable-pages.component';
+import { RxjsDragComponent } from './rxjs-drag/rxjs-drag.component';
 
 export const appRoutes: Routes = [
   { path: 'swipe-card', component: SwipeableCardsComponent },
@@ -15,7 +16,8 @@ export const appRoutes: Routes = [
   declarations: [
     AppComponent,
     SwipeableCardsComponent,
-    SwipeablePagesComponent
+    SwipeablePagesComponent,
+    RxjsDragComponent
   ],
   imports: [
     BrowserModule,
