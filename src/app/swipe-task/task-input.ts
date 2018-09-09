@@ -1,20 +1,24 @@
-import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, Input } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { TaskState, EDIT_MODE_OFF } from './swipe-task-store';
 
 @Component({
     selector: 'task-input',
     template: `
-  <input type="text" #task className="itemInput"
+  <input type="text" #task class="itemInput"
           [value]="title"
-          onChange="update($event)" onKeyDown="keyPressed($event)" onBlur="blur($event)"  />
-  `
+          (change)="update($event)" (keydown)="keyPressed($event)" (blur)="blur($event)"  />
+  `,
+  styles: [`
+  `]
 })
 export class TaskInputComponent implements OnInit {
     @ViewChild('task') task: ElementRef;
     @Output() editModeOff = new EventEmitter<boolean>();
-    id: string;
-    title: string;
+    @Input() id: string;
+    @Input() title: string;
 
-    constructor() { }
+    constructor(private store: Store<TaskState>) { }
 
     ngOnInit() {
         this.task.nativeElement.focus();
@@ -26,11 +30,13 @@ export class TaskInputComponent implements OnInit {
 
     keyPressed(event) {
         if (event.keyCode === 13) {  // Enter / Return key
+            this.store.dispatch({ type: EDIT_MODE_OFF, id: this.id });
             this.editModeOff.emit(true);
         }
     }
 
     blur(event) {
+        this.store.dispatch({ type: EDIT_MODE_OFF, id: this.id });
         this.editModeOff.emit(true);
     }
 
