@@ -10,9 +10,9 @@ import { util } from './rx-utility';
     <div [ngClass]="{'itemdraggedItem': this.state.dragging === true}" 
         [ngStyle]="itemStyle"
         #draggable>
-        <div className="itemTitle">
+        <div class="itemTitle">
             <task-input [id]="id" [title]="title" *ngIf="edited === true"></task-input>
-            <span *ngIf="edited !== true">title</span>
+            <span *ngIf="edited !== true">{{title}}</span>
         </div>
     </div>
   `
@@ -25,8 +25,8 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     @Output() delete = new EventEmitter<string>();
     @Output() moveUp = new EventEmitter<string>();
     @Output() moveDown = new EventEmitter<string>();
-    @Input() id: string;    
-    @Input() title: string;    
+    @Input() id: string;
+    @Input() title: string;
     @Input() key: string;
     @Input() editMode: boolean;
     @Input() edited: boolean;
@@ -35,7 +35,7 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     state = {
         x: 0,
         y: 0,
-        height:  0,// 'auto',
+        height: 'auto',
         dragging: false,
         shrinking: false
     };
@@ -43,96 +43,105 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     relativePosition = 0; // Relative position of the item during rearrange
     terminate = false;
 
-    constructor() { }
+    constructor(private zone: NgZone) { }
 
     ngOnInit() {
     }
 
     get itemStyle() {
+        console.log({
+            backgroundColor: this.color,
+            left: this.state.x,
+            height: this.state.height,
+            minHeight: `${this.state.shrinking ? 0 : this.itemHeight}px`,
+            opacity: (this.editMode === true && this.edited === false ? 0.3 : 1)
+        });
+
         return {
-            backgroundColor: this.color, 
-            left: this.state.x, 
-            top: this.state.y, 
-            height: this.state.height, 
-            minHeight: this.state.shrinking ? 0 : this.itemHeight,            
+            backgroundColor: this.color,
+            left: this.state.x,
+            height: this.state.height,
+            minHeight: this.state.shrinking ? 0 : this.itemHeight,
             opacity: (this.editMode === true && this.edited === false ? 0.3 : 1)
         };
     }
 
     setState(value: any) {
+        console.log({ ...this.state, ...value });
         return { ...this.state, ...value };
     }
 
     ngAfterViewInit() {
+        console.log(this.color);
         const observables = util.getDragObservables(this.draggable.nativeElement);
 
-      observables.holds.forEach(() => {
-        this.relativePosition = 0;
-        this.setState({dragging: true});
-      });
-      
-      observables.dragMoves.forEach(coordinate => {
-        if(this.editMode === false) {
-          
-          let y = coordinate.y - this.relativePosition * this.itemHeight;
-          if(y > this.itemHeight) {
-            this.relativePosition++;            
-            this.moveDown.emit(this.id);
-          }else if(y < - this.itemHeight) {
-            this.relativePosition--;
-            this.moveUp.emit(this.id);
-          }
-          y = coordinate.y - this.relativePosition * this.itemHeight;
-          this.setState({x: coordinate.x/2, y});
-        }
-      });
-      
-      observables.dragMoveEnds.forEach(coordinate => {
-        this.setState({
-          x: 0,
-          y: 0,
-          dragging: false
+        observables.holds.forEach(() => {
+            this.relativePosition = 0;
+            this.setState({ dragging: true });
         });
-      });
 
-      observables.clicks.forEach(() => {
-        if(this.editMode === false) {
-          this.editModeOn.emit(this.id);
-        }else if(this.edited === false) {
-          this.editModeOff.emit(this.id);
-        }
-      });
+        observables.dragMoves.forEach(coordinate => {
+            if (this.editMode === false) {
 
-      observables.horizontalMoves.forEach(coordinate => {
-        if(this.editMode === false) {
-          this.setState({x: coordinate.x});
-        }
-      });
+                let y = coordinate.y - this.relativePosition * this.itemHeight;
+                if (y > this.itemHeight) {
+                    this.relativePosition++;
+                    this.moveDown.emit(this.id);
+                } else if (y < - this.itemHeight) {
+                    this.relativePosition--;
+                    this.moveUp.emit(this.id);
+                }
+                y = coordinate.y - this.relativePosition * this.itemHeight;
+                this.setState({ x: coordinate.x / 2, y });
+            }
+        });
 
-      observables.horizontalMoveEnds.forEach(coordinate => {
-        if(this.editMode === false) {
-          if(coordinate.x > 40) {
-            this.slideDone()
-              .then(this.shrink)
-              .then(this.emitDone);
-          }else if(coordinate.x < - 40) {
-            this.slideDelete()
-              .then(this.shrink)
-              .then(this.emitDelete);
-          }else {
-            this.slideBack();
-          }
-        }
-      });
+        observables.dragMoveEnds.forEach(coordinate => {
+            this.setState({
+                x: 0,
+                y: 0,
+                dragging: false
+            });
+        });
+
+        observables.clicks.forEach(() => {
+            if (this.editMode === false) {
+                this.editModeOn.emit(this.id);
+            } else if (this.edited === false) {
+                this.editModeOff.emit(this.id);
+            }
+        });
+
+        observables.horizontalMoves.forEach(coordinate => {
+            if (this.editMode === false) {
+                this.setState({ x: coordinate.x });
+            }
+        });
+
+        observables.horizontalMoveEnds.forEach(coordinate => {
+            if (this.editMode === false) {
+                if (coordinate.x > 40) {
+                    this.slideDone()
+                        .then(this.shrink)
+                        .then(this.emitDone);
+                } else if (coordinate.x < - 40) {
+                    this.slideDelete()
+                        .then(this.shrink)
+                        .then(this.emitDelete);
+                } else {
+                    this.slideBack();
+                }
+            }
+        });
     }
 
     ngOnDestroy() {
-        if(this.terminate === false && this.editMode === false && this.title === '') {
+        if (this.terminate === false && this.editMode === false && this.title === '') {
             this.terminate = true;
             this.slideDelete()
-              .then(this.shrink)
-              .then(this.emitDelete);
-          }
+                .then(this.shrink)
+                .then(this.emitDelete);
+        }
     }
 
     slideBack() {
@@ -150,10 +159,16 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.setState({ x });
             }
             lastTime = time;
-            if (x !== 0) requestAnimationFrame(slideBackAnimation);
-        }).bind(this);
+            if (x !== 0) {
+                this.zone.runOutsideAngular(() => {
+                    requestAnimationFrame(slideBackAnimation);
+                });
+            }
 
-        requestAnimationFrame(slideBackAnimation)
+        }).bind(this);
+        this.zone.runOutsideAngular(() => {
+            requestAnimationFrame(slideBackAnimation)
+        });
     }
 
     slideDone() {
@@ -168,8 +183,10 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             lastTime = time;
             if (x < 375) {
-                requestAnimationFrame((time) => {
-                    slideDoneAnimation(resolve, reject, time);
+                this.zone.runOutsideAngular(() => {
+                    requestAnimationFrame((time) => {
+                        slideDoneAnimation(resolve, reject, time);
+                    });
                 });
             } else {
                 resolve();
@@ -177,8 +194,10 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
         }).bind(this);
 
         return new Promise((resolve, reject) => {
-            requestAnimationFrame((time) => {
-                slideDoneAnimation(resolve, reject, time)
+            this.zone.runOutsideAngular(() => {
+                requestAnimationFrame((time) => {
+                    slideDoneAnimation(resolve, reject, time)
+                });
             });
         });
     }
@@ -195,8 +214,10 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             lastTime = time;
             if (x > -375) {
-                requestAnimationFrame((time) => {
-                    slideDeleteAnimation(resolve, reject, time);
+                this.zone.runOutsideAngular(() => {
+                    requestAnimationFrame((time) => {
+                        slideDeleteAnimation(resolve, reject, time);
+                    });
                 });
             } else {
                 resolve();
@@ -204,8 +225,10 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
         }).bind(this);
 
         return new Promise((resolve, reject) => {
-            requestAnimationFrame((time) => {
-                slideDeleteAnimation(resolve, reject, time);
+            this.zone.runOutsideAngular(() => {
+                requestAnimationFrame((time) => {
+                    slideDeleteAnimation(resolve, reject, time);
+                });
             });
         });
     }
@@ -227,8 +250,10 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
             }
             lastTime = time;
             if (height > 0) {
-                requestAnimationFrame((time) => {
-                    shrinkAnimation(resolve, reject, time)
+                this.zone.runOutsideAngular(() => {
+                    requestAnimationFrame((time) => {
+                        shrinkAnimation(resolve, reject, time)
+                    });
                 });
             } else {
                 resolve();
@@ -236,8 +261,10 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
         }).bind(this);
 
         return new Promise((resolve, reject) => {
-            requestAnimationFrame((time) => {
-                shrinkAnimation(resolve, reject, time);
+            this.zone.runOutsideAngular(() => {
+                requestAnimationFrame((time) => {
+                    shrinkAnimation(resolve, reject, time);
+                });
             });
         });
     }

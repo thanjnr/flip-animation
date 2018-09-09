@@ -31,7 +31,7 @@ import { TaskState } from './swipe-task-store';
             </div>        
             <task-item *ngFor="let item of props.items; let i = index"
                 [key]="item.id" [id]="item.id" 
-                [title]="item.title" [color]="props.colors[index]"
+                [title]="item.title" [color]="props.colors[i]"
                 [editMode]="editMode" 
                 [edited]="props.currentEdit.itemId === item.id || props.currentEdit.itemId === 'FIRST' && index === 0">
             </task-item>
@@ -42,7 +42,7 @@ import { TaskState } from './swipe-task-store';
 export class TaskListComponent implements OnInit, AfterViewInit {
     @ViewChild('draggable') draggable: ElementRef;
     @ViewChild('fakeinput') fakeInput: ElementRef;
-    @Output() appendTop = new EventEmitter<string>();   
+    @Output() appendTop = new EventEmitter<string>();
     @Input() props: TaskState;
     @Input() editMode: boolean;
 
@@ -52,10 +52,10 @@ export class TaskListComponent implements OnInit, AfterViewInit {
         fakeInputVisibile: false
     };
     newItemId = 0;
-    itemHeight = 52;    
-    newItemRotate = Math.max(0, Math.min(90, Math.asin(-Math.min(this.itemHeight, this.state.y)/this.itemHeight)/Math.PI*180+90));
+    itemHeight = 52;
+    newItemRotate = Math.max(0, Math.min(90, Math.asin(-Math.min(this.itemHeight, this.state.y) / this.itemHeight) / Math.PI * 180 + 90));
 
-    constructor() { }
+    constructor(private zone: NgZone) { }
 
     ngOnInit() {
     }
@@ -120,10 +120,15 @@ export class TaskListComponent implements OnInit, AfterViewInit {
                 this.setState({ y });
             }
             lastTime = time;
-            if (y !== 0) requestAnimationFrame(slideBackAnimation);
+            if (y !== 0) {
+                this.zone.runOutsideAngular(() => {
+                    requestAnimationFrame(slideBackAnimation);
+                });
+            }
         }).bind(this);
-
-        requestAnimationFrame(slideBackAnimation)
+        this.zone.runOutsideAngular(() => {
+            requestAnimationFrame(slideBackAnimation);
+        });
     }
 
     slideToEdit() {
@@ -139,7 +144,9 @@ export class TaskListComponent implements OnInit, AfterViewInit {
             console.log(y);
             lastTime = time;
             if (y > this.itemHeight) {
-                requestAnimationFrame((time) => { slideToEditAnimation(resolve, reject, time) });
+                this.zone.runOutsideAngular(() => {
+                    requestAnimationFrame((time) => { slideToEditAnimation(resolve, reject, time) });
+                });
             } else {
                 this.setState({ y: 0 });
                 resolve();
@@ -147,8 +154,10 @@ export class TaskListComponent implements OnInit, AfterViewInit {
         }).bind(this);
 
         return new Promise((resolve, reject) => {
-            requestAnimationFrame((time) => {
-                slideToEditAnimation(resolve, reject, time)
+            this.zone.runOutsideAngular(() => {
+                requestAnimationFrame((time) => {
+                    slideToEditAnimation(resolve, reject, time)
+                });
             });
         });
     }

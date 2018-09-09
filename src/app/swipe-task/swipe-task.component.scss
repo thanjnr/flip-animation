@@ -56,7 +56,7 @@ html {
   }
   
 }
-.itemTitle {
+:host ::ng-deep .itemTitle {
   padding: 17px;
   color: white;
   user-select: none;
