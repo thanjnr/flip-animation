@@ -49,13 +49,13 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     get itemStyle() {
-        console.log({
-            backgroundColor: this.color,
-            left: this.state.x,
-            height: this.state.height,
-            minHeight: `${this.state.shrinking ? 0 : this.itemHeight}px`,
-            opacity: (this.editMode === true && this.edited === false ? 0.3 : 1)
-        });
+        /*  console.log({
+             backgroundColor: this.color,
+             left: this.state.x,
+             height: this.state.height,
+             minHeight: `${this.state.shrinking ? 0 : this.itemHeight}px`,
+             opacity: (this.editMode === true && this.edited === false ? 0.3 : 1)
+         }); */
 
         return {
             backgroundColor: this.color,
@@ -67,12 +67,20 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     setState(value: any) {
-        console.log({ ...this.state, ...value });
+        // console.log({ ...this.state, ...value });
+        this.state = { ...this.state, ...value };
+
+        this.zone.runOutsideAngular(() => {
+            requestAnimationFrame(() => {
+                this.draggable.nativeElement.style.transform = `translateX(${this.state.x}px)`;
+
+            });
+        });
         return { ...this.state, ...value };
     }
 
     ngAfterViewInit() {
-        console.log(this.color);
+        // console.log(this.color);
         const observables = util.getDragObservables(this.draggable.nativeElement);
 
         observables.holds.forEach(() => {
@@ -122,12 +130,12 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
             if (this.editMode === false) {
                 if (coordinate.x > 40) {
                     this.slideDone()
-                        .then(this.shrink)
-                        .then(this.emitDone);
+                        .then(() => this.shrink())
+                        .then(() => this.emitDone());
                 } else if (coordinate.x < - 40) {
                     this.slideDelete()
-                        .then(this.shrink)
-                        .then(this.emitDelete);
+                        .then(() => this.shrink())
+                        .then(() => this.emitDelete());
                 } else {
                     this.slideBack();
                 }
@@ -139,8 +147,8 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
         if (this.terminate === false && this.editMode === false && this.title === '') {
             this.terminate = true;
             this.slideDelete()
-                .then(this.shrink)
-                .then(this.emitDelete);
+                .then(() => this.shrink())
+                .then(() => this.emitDelete());
         }
     }
 
