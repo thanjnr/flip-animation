@@ -1,5 +1,8 @@
-import { Component, OnInit, AfterViewInit, Inject } from '@angular/core';
-import { Observable, fromEvent } from 'rxjs';
+import { Component, OnInit, Inject, AfterViewInit, NgZone, ViewChild, ElementRef, ViewChildren } from '@angular/core';
+import { interval, Scheduler, fromEvent } from 'rxjs';
+import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
+import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { CardState } from './card-state';
 
 @Component({
   selector: 'app-swipeable-cards',
@@ -7,7 +10,177 @@ import { Observable, fromEvent } from 'rxjs';
   styleUrls: ['./swipeable-cards.component.css']
 })
 export class SwipeableCardsComponent implements OnInit, AfterViewInit {
+  @ViewChild('justmove') card: ElementRef;
+  @ViewChildren('card') cards;
+  VIEWBOX_SIZE = { W: 600, H: 600 };
+  animationFrame$ = interval(0, animationFrame);
+  currentState: CardState;
 
+  constructor(private zone: NgZone,
+    @Inject('Flipping') public Flipping: any,
+    @Inject('Hammer') public Hammer: any,
+    @Inject('RxCSS') public RxCSS: any) { }
+
+  ngOnInit() {
+
+  }
+
+  ngAfterViewInit() {
+    const cardNative = this.card.nativeElement;
+
+    const location$ = this.handleDrag(cardNative);
+
+    location$.subscribe((cardState: CardState) => {
+      this.zone.runOutsideAngular(() => {
+        requestAnimationFrame(() => {
+          // console.log('moving...');
+          this.moveTo(cardState, cardNative);
+        })
+      });
+    },
+      null,
+      (e) => { console.log(e); });
+    new Cards();
+  }
+
+  /**
+   * Generate the drag handler for a DOM element
+   */
+  handleDrag(element) {
+    // Create a new Hammer Manager
+    const hammerPan = new this.Hammer(element, {
+      direction: this.Hammer.DIRECTION_ALL
+    });
+
+    hammerPan.get("pan").set({ direction: this.Hammer.DIRECTION_ALL });
+
+    // Convert hammer events to an observable
+    const pan$ = fromEvent(hammerPan, "panstart panmove panend");
+    // alternatively you can use fromEventPattern:
+    // const pan$ = Rx.Observable.fromEventPattern(h =>
+    //   hammerPan.on('panstart panmove panend', h),
+    // );
+
+    const drag$ = this.drag({
+      element: element,
+      pan$
+    });
+
+    // Smooth the drag location using lerp
+    return drag$;
+  }
+
+  // For a more detailed explanation see: http://varun.ca/drag-with-rxjs/
+  // Create an observable stream to handle drag gesture
+
+  drag({ element, pan$ }) {
+    const panStart$ = pan$.pipe(filter((e: any) => e.type === "panstart"));
+    const panMove$ = pan$.pipe(filter((e: any) => e.type === "panmove"));
+    const panEnd$ = pan$.pipe(filter((e: any) => e.type === "panend"),
+      map((e) => {
+        console.log('ending...');
+        this.onEnd(e, element);
+        return e;
+      }));
+
+    return panStart$.pipe(switchMap((e) => {
+      // Get the starting point on panstart
+      const cardState = this.getStartInfo(element, e);
+      this.zone.runOutsideAngular(() => {
+        requestAnimationFrame(() => {
+          element.style.willChange = 'transform';
+        })
+      });
+
+      // Create observable to handle pan-move 
+      // and stop on pan-end
+      const move$ = panMove$.pipe(
+        map((e: any) => {
+          // console.log(e.srcEvent.pageX);
+          cardState.currentX = e.srcEvent.pageX || e.srcEvent.touches[0].pageX;
+          cardState.screenX = cardState.currentX - cardState.startX;
+          this.currentState = cardState;
+          return cardState;
+        }),
+        takeUntil(panEnd$)
+      );
+
+      return move$;
+    }));
+  };
+
+  onEnd(evt, element) {console.log(evt);
+    this.currentState.targetX = 0;
+    let screenX = this.currentState.currentX - this.currentState.startX;
+    const threshold = this.currentState.targetBCR.width * 0.35;
+    if (Math.abs(screenX) > threshold) {
+      this.currentState.targetX = (screenX > 0) ?
+        this.currentState.targetBCR.width :
+        -this.currentState.targetBCR.width;
+    }
+    console.log(this.currentState);
+    console.log(Math.abs(this.currentState.screenX));
+    this.currentState.screenX += (this.currentState.targetX - this.currentState.screenX) / 4;
+    
+    this.moveTo(this.currentState, element);
+  }
+  /**
+   * Utils
+   */
+  getStartInfo(element, event) {
+    return {
+      startX: event.srcEvent.pageX || event.srcEvent.touches[0].pageX,
+      currentX: event.srcEvent.pageX || event.srcEvent.touches[0].pageX,
+      draggingCard: true,
+      target: element,
+      targetBCR: element.getBoundingClientRect(),
+      screenX: 0
+    } as CardState;
+  }
+
+  moveTo(cardState: CardState, element) {
+    const normalizedDragDistance =
+      (Math.abs(cardState.screenX) / cardState.targetBCR.width);
+    const opacity = 1 - Math.pow(normalizedDragDistance, 3);
+    element.style.transform = `translateX(${cardState.screenX}px)`;
+    element.style.opacity = opacity;
+
+    const isNearlyAtStart = (Math.abs(cardState.screenX) < 0.1);
+    const isNearlyInvisible = (opacity < 0.01);
+
+    // If the card is nearly gone.
+    if (isNearlyInvisible) {
+      console.log('removing element');
+
+      // Bail if there's no target or it's not attached to a parent anymore.
+      if (!element || !element.parentNode)
+        return;
+
+      element.parentNode.removeChild(element);
+
+      const targetIndex = 0; // this.cards.indexOf(element);
+      this.cards._results.splice(targetIndex, 1);
+
+      // Slide all the other cards.
+      // this.animateOtherCardsIntoPosition(targetIndex);
+
+    } else if (isNearlyAtStart) {
+      this.resetTarget(element);
+    }
+  }
+
+  resetTarget(element) {
+    if (!element)
+      return;
+
+    element.style.willChange = 'initial';
+    element.style.transform = 'none';
+    element = null;
+  }
+
+}
+
+export class Cards {
   cards;
   targetBCR = null;
   target = null;
@@ -17,10 +190,7 @@ export class SwipeableCardsComponent implements OnInit, AfterViewInit {
   targetX = 0;
   draggingCard = false;
 
-  constructor(@Inject('Flipping') public Flipping: any,
-    @Inject('Hammer') public Hammer: any,
-    @Inject('RxCSS') public RxCSS: any) {
-
+  constructor() {
     this.cards = Array.from(document.querySelectorAll('.card'));
 
     this.onStart = this.onStart.bind(this);
@@ -40,24 +210,7 @@ export class SwipeableCardsComponent implements OnInit, AfterViewInit {
     requestAnimationFrame(this.update);
   }
 
-  ngOnInit() {
-
-  }
-
-  ngAfterViewInit() {
-  }
-
   addEventListeners() {
-    // Create a new Hammer Manager
-    const hammerPan = new this.Hammer(document, {
-      direction: this.Hammer.DIRECTION_ALL,
-    });
-
-    hammerPan.get('pan').set({ direction: this.Hammer.DIRECTION_ALL });
-
-    // Convert hammer events to an observable
-    const pan$ = fromEvent(hammerPan, 'panstart panmove panend');
-
     document.addEventListener('touchstart', this.onStart);
     document.addEventListener('touchmove', this.onMove);
     document.addEventListener('touchend', this.onEnd);
@@ -97,16 +250,16 @@ export class SwipeableCardsComponent implements OnInit, AfterViewInit {
     if (!this.target)
       return;
 
-    this.targetX = 0;
-    let screenX = this.currentX - this.startX;
-    const threshold = this.targetBCR.width * 0.35;
-    if (Math.abs(screenX) > threshold) {
-      this.targetX = (screenX > 0) ?
-        this.targetBCR.width :
-        -this.targetBCR.width;
-    }
-
-    this.draggingCard = false;
+     this.targetX = 0;
+     let screenX = this.currentX - this.startX;
+     const threshold = this.targetBCR.width * 0.35;
+     if (Math.abs(screenX) > threshold) {
+       this.targetX = (screenX > 0) ?
+         this.targetBCR.width :
+         -this.targetBCR.width;
+     }
+ 
+     this.draggingCard = false;
   }
 
   update() {

@@ -12,8 +12,6 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
   @ViewChild('justmove') circle: ElementRef;
   VIEWBOX_SIZE = { W: 600, H: 600 };
   animationFrame$ = interval(0, animationFrame);
-  x: 0;
-  y: 0;
 
   constructor(private zone: NgZone,
     @Inject('Flipping') public Flipping: any,
@@ -26,8 +24,7 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     // Dom nodes
-    let moveEl = document.querySelector("#js-move");
-    console.log(moveEl);
+    const moveEl = document.querySelector("#js-move");
     const location$ = this.handleDrag(moveEl).pipe(startWith([200, 300]));
 
     location$.pipe(
@@ -40,8 +37,10 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
     )
       .subscribe(({ moveElLocation }) => {
         this.zone.runOutsideAngular(() => {
-          console.log('moving...');
-          this.moveTo(moveElLocation, moveEl);
+          requestAnimationFrame(() => {
+            console.log('moving...');
+            this.moveTo(moveElLocation, moveEl);
+          })
         });       
       });
   }
@@ -156,9 +155,9 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
 
   moveTo([x, y], element) { 
     
-    this.circle.nativeElement.setAttribute("cx", x);
-    this.circle.nativeElement.setAttribute("cy",y);
-    /* element.setAttribute("cx", x);
-    element.setAttribute("cy", y); */
+    // this.circle.nativeElement.setAttribute("cx", x);
+    // this.circle.nativeElement.setAttribute("cy",y);
+     element.setAttribute("cx", x);
+    element.setAttribute("cy", y); 
   }
 }
