@@ -3,6 +3,8 @@ import { interval, Scheduler, fromEvent } from 'rxjs';
 import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
 import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { util } from './rx-utility';
+import { Store } from '@ngrx/store';
+import { TaskState, DELETE, DONE, MOVE_UP, MOVE_DOWN, EDIT_MODE_ON, EDIT_MODE_OFF } from './swipe-task-store';
 
 @Component({
     selector: 'task-item',
@@ -43,7 +45,7 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     relativePosition = 0; // Relative position of the item during rearrange
     terminate = false;
 
-    constructor(private zone: NgZone) { }
+    constructor(private zone: NgZone, private store: Store<TaskState>) { }
 
     ngOnInit() {
     }
@@ -94,9 +96,11 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
                 let y = coordinate.y - this.relativePosition * this.itemHeight;
                 if (y > this.itemHeight) {
                     this.relativePosition++;
+                    this.dispatchAction(MOVE_DOWN);
                     this.moveDown.emit(this.id);
                 } else if (y < - this.itemHeight) {
                     this.relativePosition--;
+                    this.dispatchAction(MOVE_UP);
                     this.moveUp.emit(this.id);
                 }
                 y = coordinate.y - this.relativePosition * this.itemHeight;
@@ -114,8 +118,10 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
         observables.clicks.forEach(() => {
             if (this.editMode === false) {
+                this.dispatchAction(EDIT_MODE_ON);
                 this.editModeOn.emit(this.id);
             } else if (this.edited === false) {
+                this.dispatchAction(EDIT_MODE_OFF);
                 this.editModeOff.emit(this.id);
             }
         });
@@ -278,11 +284,17 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     emitDone() {
+        this.store.dispatch({ type: DONE });
         this.done.emit(this.id);
     }
 
     emitDelete() {
+        this.store.dispatch({ type: DELETE });
         this.delete.emit(this.id);
+    }
+
+    dispatchAction(type) {
+        this.store.dispatch({ type });
     }
 
 }

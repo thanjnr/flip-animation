@@ -67,7 +67,7 @@ const List = (() => {
       let lastTime = null;
 
       const slideToEditAnimation = ((resolve, reject, time) => {
-        let y = this.state.y; 
+        let y = this.state.y;
         if(lastTime !== null) {
           const delta = (time - lastTime) * 0.7;
           y = Math.max(this.itemHeight, this.state.y - delta);
@@ -86,10 +86,10 @@ const List = (() => {
       return new Promise((resolve, reject) => {
         requestAnimationFrame((time) => {
           slideToEditAnimation(resolve, reject, time)
-        });  
+        });
       });
     }
-    
+
     onFakeInputBlur() {
       this.setState({fakeInputVisibile: false});
     }
@@ -97,7 +97,7 @@ const List = (() => {
     render() {
       const newItemRotate = Math.max(0, Math.min(90, Math.asin(-Math.min(this.itemHeight, this.state.y)/this.itemHeight)/Math.PI*180+90));
       const fakeInput = this.state.fakeInputVisibile ? (
-        <input 
+        <input
           // The fake input's role is to force the keyboard to show up on mobile devices. 
           // On mobile devices the focus can only be set to an input field from code if:
           // - the focus method is called as a direct result of a user interaction or
@@ -107,29 +107,28 @@ const List = (() => {
           // so the focus is set for the fake input to force the keyboard to show up, 
           // then reset by the real input field once the keyboard is already there.
           id='fakeInput' type='text'
-          ref={(fakeInput) => { this.fakeInput = fakeInput; }} 
+          ref={(fakeInput) => { this.fakeInput = fakeInput; }}
           onBlur={this.onFakeInputBlur}/>
       ) : '';
       return (
         <div id='container'>
-          <div 
+          <div
             id='list'
             style={{top: Math.min(0, this.state.y)}}
             ref={(draggable) => { this.draggable = draggable; }} >
-            
             <div id='newItemPerspective' style={{height: Math.max(0, this.state.y)}}>
               <div id='newItem' style={{ transform: `rotateX(${newItemRotate}deg)`}}>
                 {fakeInput}
-                <Item 
-                  key={this.newItemId} id={this.newItemId} 
+                <Item
+                  key={this.newItemId} id={this.newItemId}
                   title={this.state.newItemTitle} color={this.props.colors[0]}/>
               </div>
-            </div>            
-            {this.props.items.map((item, index) => 
-              <Item 
-                key={item.id} id={item.id} 
+            </div>
+            {this.props.items.map((item, index) =>
+              <Item
+                key={item.id} id={item.id}
                 title={item.title} color={this.props.colors[index]}
-                edit_mode={this.props.edit_mode} 
+                edit_mode={this.props.edit_mode}
                 edited={this.props.edited_item === item.id || this.props.edited_item === 'FIRST' && index === 0}/>
             )}
           </div>

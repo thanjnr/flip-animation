@@ -1,6 +1,7 @@
 import { Component, OnInit, AfterViewInit, NgZone, ViewChild, ElementRef, Output, EventEmitter, Input } from '@angular/core';
 import { util } from './rx-utility';
-import { TaskState } from './swipe-task-store';
+import { TaskState, APPEND_TOP } from './swipe-task-store';
+import { Store } from '@ngrx/store';
 
 @Component({
     selector: 'task-list',
@@ -19,7 +20,7 @@ import { TaskState } from './swipe-task-store';
                 so the focus is set for the fake input to force the keyboard to show up,
                 then reset by the real input field once the keyboard is already there.
                 -->
-                <input id="fakeInput" type="text" #fakeinput (blur)="onFakeInputBlur()"/>
+                <input *ngIf="state.fakeInputVisible === true" id="fakeInput" type="text" #fakeinput (blur)="onFakeInputBlur()"/>
 
                 <task-item
                   [key]="newItemId" [id]="newItemId"
@@ -52,7 +53,7 @@ export class TaskListComponent implements OnInit, AfterViewInit {
     itemHeight = 52;
     newItemRotate = Math.max(0, Math.min(90, Math.asin(-Math.min(this.itemHeight, this.state.y) / this.itemHeight) / Math.PI * 180 + 90));
 
-    constructor(private zone: NgZone) { }
+    constructor(private zone: NgZone, private store: Store<TaskState>) { }
 
     ngOnInit() {
     }
@@ -166,6 +167,6 @@ export class TaskListComponent implements OnInit, AfterViewInit {
     }
 
     emitAppendTop() {
-        this.appendTop.emit();
+        this.store.dispatch({ type: APPEND_TOP });
     }
 }
