@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { TaskState } from './swipe-task-store';
 import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-swipe-task',
@@ -9,13 +10,14 @@ import { Observable } from 'rxjs';
   styleUrls: ['./swipe-task.component.scss']
 })
 export class SwipeTaskComponent implements OnInit {
-  items: Observable<any[]>;
+  items: Observable<TaskState>;
 
   constructor(private store: Store<TaskState>){
-		this.items = this.store.select('items');
+		this.items = this.store;
 	}
 
   ngOnInit() {
+    this.items.pipe(take(1)).subscribe((items) => console.log(items));
   }
 }
 

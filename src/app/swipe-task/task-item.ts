@@ -7,14 +7,14 @@ import { util } from './rx-utility';
 @Component({
     selector: 'task-item',
     template: `
-    <div className={"item" + (this.state.dragging === true ? " draggedItem" : "")}
+    <div [ngClass]="{'itemdraggedItem': this.state.dragging === true}" 
         [ngStyle]="itemStyle"
         #draggable>
-    <div className="itemTitle">
-        <task-input [id]="id" [title]="title" *ngIf="edited === true"></task-input>
-        <span *ngIf="edited !== true">title</span>
+        <div className="itemTitle">
+            <task-input [id]="id" [title]="title" *ngIf="edited === true"></task-input>
+            <span *ngIf="edited !== true">title</span>
+        </div>
     </div>
-  </div>
   `
 })
 export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {

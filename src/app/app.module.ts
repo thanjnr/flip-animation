@@ -9,6 +9,9 @@ import { SwipeablePagesComponent } from './swipeable-pages/swipeable-pages.compo
 import { RxjsDragComponent } from './rxjs-drag/rxjs-drag.component';
 import { SwipeTaskComponent } from './swipe-task/swipe-task.component';
 import { itemReducer, colorReducer, editReducer } from './swipe-task/swipe-task-store';
+import { TaskListComponent } from './swipe-task/task-list.component';
+import { TaskItemComponent } from './swipe-task/task-item';
+import { TaskInputComponent } from './swipe-task/task-input';
 
 export const appRoutes: Routes = [
   { path: 'swipe-card', component: SwipeableCardsComponent },
@@ -23,7 +26,10 @@ export const appRoutes: Routes = [
     SwipeableCardsComponent,
     SwipeablePagesComponent,
     RxjsDragComponent,
-    SwipeTaskComponent
+    SwipeTaskComponent,
+    TaskListComponent,
+    TaskItemComponent,
+    TaskInputComponent
   ],
   imports: [
     BrowserModule,
@@ -34,7 +40,7 @@ export const appRoutes: Routes = [
     StoreModule.forRoot({
       items: itemReducer,
       colors: colorReducer,
-      edit: editReducer
+      currentEdit: editReducer
   }),
   ],
   providers: [

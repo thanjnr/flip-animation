@@ -9,10 +9,9 @@ import { TaskState } from './swipe-task-store';
     selector: 'task-list',
     template: `
     <div id='container'>
-          <div id="list" [ngStyle]="{'top': Math.max(0, state.y)}" #draggable >
-            
-            <div id="newItemPerspective" [ngStyle]="{'height': Math.max(0, state.y)}">
-                <div id="newItem" [ngStyle]="{'transform': 'rotateX(' + newItemRotate + 'deg)'}">
+          <div id="list" [ngStyle]="{'top': maxY()}" #draggable >
+            <div id="newItemPerspective" [ngStyle]="{'height': maxY()}">
+                <div id="newItem" >
 
                 <!-- The fake input's role is to force the keyboard to show up on mobile devices. 
                 On mobile devices the focus can only be set to an input field from code if:
@@ -27,14 +26,14 @@ import { TaskState } from './swipe-task-store';
 
                 <task-item 
                   [key]="newItemId" [id]="newItemId" 
-                  [title]="state.newItemTitle" [color]="colors[0]"></task-item>
+                  [title]="state.newItemTitle" [color]="props.colors[0]"></task-item>
               </div>
             </div>        
-            <task-item *ngFor="let item in items; let i = index"
+            <task-item *ngFor="let item of props.items; let i = index"
                 [key]="item.id" [id]="item.id" 
-                [title]="item.title" [color]="colors[index]"
+                [title]="item.title" [color]="props.colors[index]"
                 [editMode]="editMode" 
-                [edited]="props.currentEdit.itemId === item.id || props.currentEdit.itemId === 'FIRST' && index === 0}>
+                [edited]="props.currentEdit.itemId === item.id || props.currentEdit.itemId === 'FIRST' && index === 0">
             </task-item>
           </div>
         </div>
@@ -59,6 +58,10 @@ export class TaskListComponent implements OnInit, AfterViewInit {
     constructor() { }
 
     ngOnInit() {
+    }
+
+    maxY() {
+        return Math.max(0, this.state.y);
     }
 
     setState(value: any) {

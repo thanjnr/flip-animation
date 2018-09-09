@@ -113,22 +113,22 @@ export const editReducer = (state = initialState.currentEdit, action) => {
     switch (action.type) {
         case 'APPEND_TOP': {
             return {
-                edit_mode: true,
-                edited_item: 'FIRST'
+                mode: true,
+                itemId: 0 // 'FIRST'
             }
         }
         case 'EDIT_MODE_ON': {
             console.log('EDIT MODE ON', action.id);
             return {
-                edit_mode: true,
-                edited_item: action.id
+                mode: true,
+                itemId: action.id
             };
         }
         case 'EDIT_MODE_OFF': {
             console.log('EDIT MODE OFF');
             return {
-                edit_mode: false,
-                edited_item: null
+                mode: false,
+                itemId: null
             };
         }
         default:
