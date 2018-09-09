@@ -1,7 +1,4 @@
-import { Component, OnInit, Inject, AfterViewInit, NgZone, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
-import { interval, Scheduler, fromEvent } from 'rxjs';
-import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
-import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter } from '@angular/core';
 
 @Component({
     selector: 'task-input',
@@ -28,7 +25,7 @@ export class TaskInputComponent implements OnInit {
     }
 
     keyPressed(event) {
-        if (event.keyCode == 13) {  // Enter / Return key
+        if (event.keyCode === 13) {  // Enter / Return key
             this.editModeOff.emit(true);
         }
     }

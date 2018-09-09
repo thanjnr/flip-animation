@@ -1,7 +1,4 @@
-import { Component, OnInit, Inject, AfterViewInit, NgZone, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, Input } from '@angular/core';
-import { interval, Scheduler, fromEvent } from 'rxjs';
-import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
-import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { Component, OnInit, AfterViewInit, NgZone, ViewChild, ElementRef, Output, EventEmitter, Input } from '@angular/core';
 import { util } from './rx-utility';
 import { TaskState } from './swipe-task-store';
 
@@ -13,26 +10,26 @@ import { TaskState } from './swipe-task-store';
             <div id="newItemPerspective" [ngStyle]="{'height': maxY()}">
                 <div id="newItem" >
 
-                <!-- The fake input's role is to force the keyboard to show up on mobile devices. 
+                <!-- The fake input's role is to force the keyboard to show up on mobile devices.
                 On mobile devices the focus can only be set to an input field from code if:
                 - the focus method is called as a direct result of a user interaction or
                 - the keyboard is already shown.
                 In this case the user interaction happens to be in this component therefore,
                 the focus can be set here, but the item desired focus is two components deep,
-                so the focus is set for the fake input to force the keyboard to show up, 
+                so the focus is set for the fake input to force the keyboard to show up,
                 then reset by the real input field once the keyboard is already there.
                 -->
-                <input id="fakeInput" type="text" #fakeinput onBlur="onFakeInputBlur()"/>
+                <input id="fakeInput" type="text" #fakeinput (blur)="onFakeInputBlur()"/>
 
-                <task-item 
-                  [key]="newItemId" [id]="newItemId" 
+                <task-item
+                  [key]="newItemId" [id]="newItemId"
                   [title]="state.newItemTitle" [color]="props.colors[0]"></task-item>
               </div>
-            </div>        
+            </div>
             <task-item *ngFor="let item of props.items; let i = index"
-                [key]="item.id" [id]="item.id" 
+                [key]="item.id" [id]="item.id"
                 [title]="item.title" [color]="props.colors[i]"
-                [editMode]="editMode" 
+                [editMode]="editMode"
                 [edited]="props.currentEdit.itemId === item.id || props.currentEdit.itemId === 'FIRST' && index === 0">
             </task-item>
           </div>
@@ -97,7 +94,7 @@ export class TaskListComponent implements OnInit, AfterViewInit {
                     });
                     this.fakeInput.nativeElement.focus();
                     this.slideToEdit()
-                        .then(this.appendTop.emit);
+                        .then(this.emitAppendTop.bind(this));
                 } else {
                     this.slideBack();
                 }
@@ -145,18 +142,20 @@ export class TaskListComponent implements OnInit, AfterViewInit {
             lastTime = time;
             if (y > this.itemHeight) {
                 this.zone.runOutsideAngular(() => {
-                    requestAnimationFrame((time) => { slideToEditAnimation(resolve, reject, time) });
+                    requestAnimationFrame((timestamp) => { slideToEditAnimation(resolve, reject, timestamp); });
                 });
+                console.log('y > this.itemHeight ...');
             } else {
                 this.setState({ y: 0 });
                 resolve();
+                console.log('Resolving promise ...');
             }
         }).bind(this);
 
         return new Promise((resolve, reject) => {
             this.zone.runOutsideAngular(() => {
-                requestAnimationFrame((time) => {
-                    slideToEditAnimation(resolve, reject, time)
+                requestAnimationFrame((timestamp) => {
+                    slideToEditAnimation(resolve, reject, timestamp);
                 });
             });
         });
@@ -164,5 +163,9 @@ export class TaskListComponent implements OnInit, AfterViewInit {
 
     onFakeInputBlur() {
         this.setState({ fakeInputVisibile: false });
+    }
+
+    emitAppendTop() {
+        this.appendTop.emit();
     }
 }

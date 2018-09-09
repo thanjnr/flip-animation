@@ -12,9 +12,9 @@ import { take } from 'rxjs/operators';
 export class SwipeTaskComponent implements OnInit {
   items: Observable<TaskState>;
 
-  constructor(private store: Store<TaskState>){
-		this.items = this.store;
-	}
+  constructor(private store: Store<TaskState>) {
+    this.items = this.store;
+  }
 
   ngOnInit() {
     this.items.pipe(take(1)).subscribe((items) => console.log(items));

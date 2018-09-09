@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, AfterViewInit, NgZone, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, NgZone, ViewChild, ElementRef, Output, EventEmitter, OnDestroy, Input } from '@angular/core';
 import { interval, Scheduler, fromEvent } from 'rxjs';
 import { animationFrame } from 'rxjs/internal/scheduler/animationFrame';
 import { withLatestFrom, scan, map, startWith, filter, switchMap, takeUntil, distinctUntilChanged } from 'rxjs/operators';
@@ -7,7 +7,7 @@ import { util } from './rx-utility';
 @Component({
     selector: 'task-item',
     template: `
-    <div [ngClass]="{'itemdraggedItem': this.state.dragging === true}" 
+    <div [ngClass]="{'itemdraggedItem': this.state.dragging === true}"
         [ngStyle]="itemStyle"
         #draggable>
         <div class="itemTitle">
@@ -35,7 +35,7 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     state = {
         x: 0,
         y: 0,
-        height: 'auto',
+        height: 52,
         dragging: false,
         shrinking: false
     };
@@ -175,7 +175,7 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
         }).bind(this);
         this.zone.runOutsideAngular(() => {
-            requestAnimationFrame(slideBackAnimation)
+            requestAnimationFrame(slideBackAnimation);
         });
     }
 
@@ -192,8 +192,8 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
             lastTime = time;
             if (x < 375) {
                 this.zone.runOutsideAngular(() => {
-                    requestAnimationFrame((time) => {
-                        slideDoneAnimation(resolve, reject, time);
+                    requestAnimationFrame((timestamp) => {
+                        slideDoneAnimation(resolve, reject, timestamp);
                     });
                 });
             } else {
@@ -203,8 +203,8 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
         return new Promise((resolve, reject) => {
             this.zone.runOutsideAngular(() => {
-                requestAnimationFrame((time) => {
-                    slideDoneAnimation(resolve, reject, time)
+                requestAnimationFrame((timestamp) => {
+                    slideDoneAnimation(resolve, reject, timestamp);
                 });
             });
         });
@@ -223,8 +223,8 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
             lastTime = time;
             if (x > -375) {
                 this.zone.runOutsideAngular(() => {
-                    requestAnimationFrame((time) => {
-                        slideDeleteAnimation(resolve, reject, time);
+                    requestAnimationFrame((timestamp) => {
+                        slideDeleteAnimation(resolve, reject, timestamp);
                     });
                 });
             } else {
@@ -259,8 +259,8 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
             lastTime = time;
             if (height > 0) {
                 this.zone.runOutsideAngular(() => {
-                    requestAnimationFrame((time) => {
-                        shrinkAnimation(resolve, reject, time)
+                    requestAnimationFrame((timestamp) => {
+                        shrinkAnimation(resolve, reject, timestamp);
                     });
                 });
             } else {
