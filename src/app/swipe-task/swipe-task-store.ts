@@ -76,6 +76,7 @@ export const itemReducer = (state = initialState.items, action) => {
             ];
         }
         case UPDATE: {
+            console.log(`${UPDATE}: ${action}`);
             return state.map(item => {
                 if (item.id !== action.id) {
                     return item; // This isn't the item we care about - keep it as-is

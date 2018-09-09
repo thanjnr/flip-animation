@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, Output, EventEmitter, Input } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, UPDATE } from '@ngrx/store';
 import { TaskState, EDIT_MODE_OFF } from './swipe-task-store';
 
 @Component({
@@ -7,7 +7,7 @@ import { TaskState, EDIT_MODE_OFF } from './swipe-task-store';
     template: `
   <input type="text" #task class="itemInput"
           [value]="title"
-          (change)="update($event)" (keydown)="keyPressed($event)" (blur)="blur($event)"  />
+          (input)="update($event)" (keydown)="keyPressed($event)" (blur)="blur($event)"  />
   `,
   styles: [`
   `]
@@ -25,7 +25,9 @@ export class TaskInputComponent implements OnInit {
     }
 
     update(event) {
+        console.log(event);
         this.title = event.target.value;
+        this.store.dispatch({ type: UPDATE, id: this.id, title: this.title });
     }
 
     keyPressed(event) {

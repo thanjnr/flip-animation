@@ -74,12 +74,15 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
 
         this.zone.runOutsideAngular(() => {
             requestAnimationFrame(() => {
-                this.draggable.nativeElement.style.transform = `translateX(${this.state.x}px)`;
-                this.draggable.nativeElement.style.opacity = `${(this.editMode === true && this.edited === false ? 0.3 : 1)}`;
-
+                this.updateStyle();
             });
         });
         return { ...this.state, ...value };
+    }
+
+    updateStyle() {
+        this.draggable.nativeElement.style.transform = `translateX(${this.state.x}px)`;
+        this.draggable.nativeElement.style.opacity = `${(this.editMode === true && this.edited === false ? 0.3 : 1)}`;
     }
 
     ngAfterViewInit() {
