@@ -1,0 +1,219 @@
+// Content
+@import url('https://fonts.googleapis.com/css?family=Roboto:300');
+
+$primary-color: #AA2331;
+$secondary-color: #191919;
+
+html {
+  background-color: black;
+}
+@media only screen and (min-device-width : 376px)  { 
+  html {
+    background-color: #F4F5F7;
+  }
+}
+
+#container {
+  font-family: 'Roboto', sans-serif;
+  color: $primary-color;
+  background-color: black;
+  height: 100%;
+}
+#list {
+  position: relative;
+  height: 100%;
+}
+#newItemPerspective {
+  perspective: 500px;
+  perspective-origin: center bottom;  
+  position: relative;
+}
+#newItem {
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+}
+.item {
+  cursor: default;
+  position: relative;
+  transition: background-color 0.5s, opacity 0.5s;
+}
+.draggedItem {
+  z-index: 9000;
+  box-shadow: 0px 0px 20px -5px rgba(0,0,0,0.5);
+  
+  // transform: perspective(1px) scale(1.1); // This would be nice if it wouldn't cause blur with text
+  width: 110%;
+  height: 110%;
+  margin-top: -3px;
+  margin-left: -5%;
+  
+  & .itemTitle {
+    font-size: 1.1em;
+    padding: 17px*1.1;
+  }
+  
+}
+.itemTitle {
+  padding: 17px;
+  color: white;
+  user-select: none;
+}
+#fakeInput {
+  position: absolute;
+  background-color: transparent;
+  color: transparent;
+  border: none;
+  padding: 0;
+  margin: 17px;
+}
+.itemInput {
+  width: 100%;
+  background-color: transparent;
+  font-family: 'Roboto', sans-serif;
+  color: white;
+  border: none;
+  padding: 0;
+}
+#fakeInput:focus, .itemInput:focus {
+  outline: none;
+}
+
+
+// Frame
+body {
+  margin: 0;
+}
+/*
+.html,
+.body,
+#phone,
+#phone-face,
+#screen,
+#content {
+  height: 100%;
+}
+*/
+
+@media only screen and (min-device-width : 376px)  { 
+
+  $scale:  1; //0.75;
+
+  $phone-width: 412px*$scale;
+  $phone-height: 852px*$scale;
+  $phone-radius: 67px*$scale;
+  $phone-face-width: 400px*$scale;
+  $phone-face-height: 840px*$scale;
+  $phone-face-radius: 61px*$scale;
+  $screen-width: 375px*$scale;
+  $screen-height: 667px*$scale;
+  $border-size: 1px;
+  $border-color: gray;
+
+  #phone {
+    position: relative;
+    width: $phone-width;
+    height: $phone-height;
+    border-radius: $phone-radius;
+    margin: 30px auto;
+  }
+  #phone-face {
+    width: $phone-face-width;
+    height: $phone-face-height;
+    margin: (($phone-height - $phone-face-height)/2 - $border-size) auto;
+    border-radius: $phone-face-radius;
+  }
+  #sensor {
+    width: 11px*$scale;
+    height: 11px*$scale;
+    border-radius: 5px*$scale;
+    margin: 15px*$scale auto 0 auto;
+  }
+  #camera-and-speaker {
+    width: 110px*$scale;
+    margin-top: 13px*$scale;
+    margin-left: 122px*$scale;
+    font-size: 0;
+  }
+  #camera {
+    $size: 18px*$scale;
+    display: inline-block;
+    vertical-align: middle;
+    width: $size;
+    height: $size;
+    border-radius: $size;
+  }
+  #speaker {
+    display: inline-block;
+    vertical-align: middle;
+    width: 66px*$scale;
+    height: 6px*$scale;
+    border-radius: 3px*$scale;
+    margin-left: 26px*$scale;
+  }
+  #screen {
+    background-color: white;
+    width: $screen-width;
+    height: $screen-height;
+    margin: 30px*$scale auto 0 auto;
+    overflow: hidden;
+  }
+  #content {
+    box-sizing: border-box;
+    width: 100%/$scale;
+    height: 100%/$scale;
+    transform-origin: top left;
+    transform: scale($scale, $scale);
+    -webkit-font-smoothing: antialised;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  #home-button {
+    $size: 59px*$scale;
+    width: $size;
+    height: $size;
+    margin: 17px*$scale auto 0 auto;
+    border-radius: $size;
+  }
+  #mute-button {
+    position: absolute;
+    left: -6px*$scale;
+    top: 111px*$scale;
+    height: 33px*$scale;
+    width: 6px*$scale;
+  }
+
+  #volume-up-button {
+    position: absolute;
+    left: -5px*$scale;
+    top: 181px*$scale;
+    height: 65px*$scale;
+    width: 5px*$scale;
+    border-radius: 5px*$scale 0 0 5px*$scale;
+  }
+
+  #volume-down-button {
+    position: absolute;
+    left: -5px*$scale;
+    top: 266px*$scale;
+    height: 65px*$scale;
+    width: 5px*$scale;
+    border-radius: 5px*$scale 0 0 5px*$scale;
+  }
+
+  #power-button {
+    position: absolute;
+    right: -5px*$scale;
+    top: 179px*$scale;
+    height: 65px*$scale;
+    width: 5px*$scale;
+    border-radius: 0 5px*$scale 5px*$scale 0;
+  }
+
+  .gray-border {
+    border: $border-size solid $border-color;
+    box-sizing: border-box;
+  }
+  
+}
