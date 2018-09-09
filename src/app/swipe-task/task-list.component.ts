@@ -21,7 +21,7 @@ import { Store } from '@ngrx/store';
                 then reset by the real input field once the keyboard is already there.
                 -->
                 <input *ngIf="state.fakeInputVisible === true" id="fakeInput" type="text" #fakeinput (blur)="onFakeInputBlur()"/>
-
+{{state.fakeInputVisible}}
                 <task-item
                   [key]="newItemId" [id]="newItemId"
                   [title]="state.newItemTitle" [color]="props.colors[0]"></task-item>

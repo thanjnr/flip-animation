@@ -1,4 +1,4 @@
-import { combineReducers, _createStoreReducers } from "@ngrx/store";
+import { combineReducers, _createStoreReducers } from '@ngrx/store';
 
 export interface TaskState {
     items: any[];
@@ -40,18 +40,21 @@ export const EDIT_MODE_OFF = 'EDIT_MODE_OFF';
 export const itemReducer = (state = initialState.items, action) => {
     switch (action.type) {
         case APPEND_TOP: {
-            console.log('APPEND TOP');
+            console.log(APPEND_TOP);
            const newId = new Date().getTime(); // No, the ID does not have to be the current time, but the current time is sort of unique
             return [{ id: newId, title: '' }, ...state];
         }
         case DONE: {
+            console.log(DONE);
+            console.log(state.filter(item => item.id !== action.id));
             return state.filter(item => item.id !== action.id);
         }
         case DELETE: {
+            console.log(DELETE);
             return state.filter(item => item.id !== action.id);
         }
         case MOVE_DOWN: {
-            console.log('MOVE DOWN', action.id);
+            console.log(MOVE_DOWN, action.id);
             const index = state.findIndex(item => item.id === action.id);
             if (index === state.length - 1) { return state; }
             return [
@@ -62,7 +65,7 @@ export const itemReducer = (state = initialState.items, action) => {
             ];
         }
         case MOVE_UP: {
-            console.log('MOVE UP', action.id);
+            console.log(MOVE_DOWN, action.id);
             const index = state.findIndex(item => item.id === action.id);
             if (index === 0) { return state; }
             return [

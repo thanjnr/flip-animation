@@ -135,14 +135,17 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
         observables.horizontalMoveEnds.forEach(coordinate => {
             if (this.editMode === false) {
                 if (coordinate.x > 40) {
+                    console.log('slide done');
                     this.slideDone()
                         .then(() => this.shrink())
                         .then(() => this.emitDone());
-                } else if (coordinate.x < - 40) {
+                } else if (coordinate.x < -40) {
+                    console.log('slide delete');
                     this.slideDelete()
                         .then(() => this.shrink())
                         .then(() => this.emitDelete());
                 } else {
+                    console.log('slide back');
                     this.slideBack();
                 }
             }
@@ -284,17 +287,17 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     emitDone() {
-        this.store.dispatch({ type: DONE });
+        this.store.dispatch({ type: DONE, id: this.id });
         this.done.emit(this.id);
     }
 
     emitDelete() {
-        this.store.dispatch({ type: DELETE });
+        this.store.dispatch({ type: DELETE, id: this.id });
         this.delete.emit(this.id);
     }
 
     dispatchAction(type) {
-        this.store.dispatch({ type });
+        this.store.dispatch({ type, id: this.id });
     }
 
 }
