@@ -64,7 +64,7 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     ngAfterViewInit() {
-        const observables = util.getDragObservables(this.draggable);
+        const observables = util.getDragObservables(this.draggable.nativeElement);
 
       observables.holds.forEach(() => {
         this.relativePosition = 0;

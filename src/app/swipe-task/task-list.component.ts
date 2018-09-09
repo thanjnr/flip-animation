@@ -69,7 +69,7 @@ export class TaskListComponent implements OnInit, AfterViewInit {
     }
 
     ngAfterViewInit() {
-        const observables = util.getDragObservables(this.draggable);
+        const observables = util.getDragObservables(this.draggable.nativeElement);
 
         observables.verticalMoves.forEach(coordinate => {
             if (this.editMode === false) {
