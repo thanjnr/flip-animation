@@ -63,7 +63,18 @@ export class TaskListComponent implements OnInit, AfterViewInit {
     }
 
     setState(value: any) {
+        this.state = { ...this.state, ...value };
+
+        this.zone.runOutsideAngular(() => {
+            requestAnimationFrame(() => {
+                this.updateStyle();
+            });
+        });
         return { ...this.state, ...value };
+    }
+
+    updateStyle() {
+        this.draggable.nativeElement.style.transform = `translateY(${this.state.y}px)`;
     }
 
     ngAfterViewInit() {
@@ -93,7 +104,12 @@ export class TaskListComponent implements OnInit, AfterViewInit {
                         newItemTitle: '',
                         fakeInputVisibile: true
                     });
-                    this.fakeInput.nativeElement.focus();
+                    if (this.fakeInput) {
+                        console.log('Focussing ...');
+                        this.zone.runOutsideAngular(() => {
+                            this.fakeInput.nativeElement.focus();
+                        });
+                    }
                     this.slideToEdit()
                         .then(this.emitAppendTop.bind(this));
                 } else {
