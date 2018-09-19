@@ -24,7 +24,7 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     // Dom nodes
-    const moveEl = document.querySelector("#js-move");
+    const moveEl = document.querySelector('#js-move');
     const location$ = this.handleDrag(moveEl).pipe(startWith([200, 300]));
 
     location$.pipe(
@@ -40,8 +40,8 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
           requestAnimationFrame(() => {
             console.log('moving...');
             this.moveTo(moveElLocation, moveEl);
-          })
-        });       
+          });
+        });
       });
   }
 
@@ -54,10 +54,10 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
       direction: this.Hammer.DIRECTION_ALL
     });
 
-    hammerPan.get("pan").set({ direction: this.Hammer.DIRECTION_ALL });
+    hammerPan.get('pan').set({ direction: this.Hammer.DIRECTION_ALL });
 
     // Convert hammer events to an observable
-    const pan$ = fromEvent(hammerPan, "panstart panmove panend");
+    const pan$ = fromEvent(hammerPan, 'panstart panmove panend');
     // alternatively you can use fromEventPattern:
     // const pan$ = Rx.Observable.fromEventPattern(h =>
     //   hammerPan.on('panstart panmove panend', h),
@@ -66,8 +66,8 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
     const drag$ = this.drag({
       element: element,
       pan$,
-      onStart: () => element.setAttribute("r", 12 * 2),
-      onEnd: () => element.setAttribute("r", 12)
+      onStart: () => element.setAttribute('r', 12 * 2),
+      onEnd: () => element.setAttribute('r', 12)
     });
 
     // Smooth the drag location using lerp
@@ -82,37 +82,37 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
   // Create an observable stream to handle drag gesture
 
   drag({ element, pan$, onStart, onEnd }) {
-    const panStart$ = pan$.pipe(filter((e: any) => e.type === "panstart"));
-    const panMove$ = pan$.pipe(filter((e: any) => e.type === "panmove"));
-    const panEnd$ = pan$.pipe(filter((e: any) => e.type === "panend"));
+    const panStart$ = pan$.pipe(filter((e: any) => e.type === 'panstart'));
+    const panMove$ = pan$.pipe(filter((e: any) => e.type === 'panmove'));
+    const panEnd$ = pan$.pipe(filter((e: any) => e.type === 'panend'));
 
     return panStart$.pipe(switchMap(() => {
       // Get the starting point on panstart
       const { start, w, h } = this.getStartInfo(element);
       onStart();
 
-      // Create observable to handle pan-move 
+      // Create observable to handle pan-move
       // and stop on pan-end
       const move$ = panMove$.pipe(
         map(this.scaleToCanvas({ start, w, h })),
         takeUntil(panEnd$)
       );
 
-      // We can subscribe to move$ and 
+      // We can subscribe to move$ and
       // handle cleanup in the onComplete callback
       move$.subscribe(null, null, onEnd);
 
       return move$;
     }));
-  };
+  }
 
   /**
    * Utils
    */
   getStartInfo(element) {
     const start = {
-      x: +element.getAttribute("cx"),
-      y: +element.getAttribute("cy")
+      x: +element.getAttribute('cx'),
+      y: +element.getAttribute('cy')
     };
     const w = document.body.clientWidth;
     const h = document.body.clientHeight;
@@ -153,11 +153,10 @@ export class RxjsDragComponent implements OnInit, AfterViewInit {
     };
   }
 
-  moveTo([x, y], element) { 
-    
+  moveTo([x, y], element) {
     // this.circle.nativeElement.setAttribute("cx", x);
     // this.circle.nativeElement.setAttribute("cy",y);
-     element.setAttribute("cx", x);
-    element.setAttribute("cy", y); 
+     element.setAttribute('cx', x);
+    element.setAttribute('cy', y);
   }
 }
