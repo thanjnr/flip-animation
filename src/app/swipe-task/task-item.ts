@@ -257,7 +257,7 @@ export class TaskItemComponent implements OnInit, AfterViewInit, OnDestroy {
     shrink() {
         this.setState({
             shrinking: true,
-            height: parseInt(getComputedStyle(this.draggable.nativeElement).getPropertyValue('height'))
+            height: parseInt(getComputedStyle(this.draggable.nativeElement).getPropertyValue('height'), 10)
         });
 
         let lastTime = null;

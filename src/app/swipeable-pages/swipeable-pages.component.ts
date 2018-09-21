@@ -15,14 +15,14 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
   @ViewChildren('uiNavItem') navItems;
 
   colors = {
-    0: ['#2F6692', '#231133'],
-    1: ['#9A45DB', '#4D88DB'],
+    0: ['#992fc7', '#6b0f93'],
+    1: ['#b963df', '#6b0f93'],
     2: ['#FB2474', '#934CDB'],
     3: ['#FB9C2C', '#FD2472'],
     4: ['#D8D6CD', '#FD9722'],
   };
 
-  machine = {
+  /* machine = {
     START: {
       panup: 'NAV1',
       pandown: 'START',
@@ -30,6 +30,21 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
     NAV1: {
       panup: 'NAV2',
       pandown: 'START',
+    },
+    NAV2: {
+      pandown: 'NAV1',
+      panup: 'NAV2',
+    }
+  }; */
+
+  machine = {
+    START: {
+      panup: 'NAV1',
+      pandown: 'NAV1',
+    },
+    NAV1: {
+      panup: 'NAV2',
+      pandown: 'NAV1',
     },
     NAV2: {
       pandown: 'NAV1',
@@ -53,9 +68,9 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
     console.log(this.nav);
     console.log(this.app);
     console.log(this.navItems);
-    let nativeApp = this.app.nativeElement;
-    let nativeNav = this.nav.nativeElement;
-    let nativeNavItems = this.navItems._results.map((item) => item.nativeElement);
+    const nativeApp = this.app.nativeElement;
+    const nativeNav = this.nav.nativeElement;
+    const nativeNavItems = this.navItems._results.map((item) => item.nativeElement);
 
     const appRect = nativeApp.getBoundingClientRect();
 
@@ -65,7 +80,7 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
       Object.keys(obj).forEach(key => res[key] = iteratee(obj[key], key, obj));
 
       return res;
-    }
+    };
 
     this.RxCSS.set(nativeApp, {
       colors: this.colors,
@@ -83,16 +98,30 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
       type: event.type,
       deltaX: event.deltaX,
       deltaY: event.deltaY
-    }))
+    }));
 
     const pan$ = panMapping(fromEventPattern(h => hNav.on('panstart panup pandown panleft panright panend', h)));
 
-    const initialState = {
+    /* const initialState = {
       appState: 'START',
       panning: false,
       x: 0,
       dx: 0,
       n: undefined,
+    };
+ */
+    const initialState = {
+      appState: 'NAV1',
+      changed: false,
+      direction: undefined,
+      dx: 0,
+      dy: 0,
+      n: 1,
+      panning: false,
+      pending: false,
+      prevState: 'START',
+      type: 'panend',
+      x: 0
     };
 
     const af$ = interval(0, Scheduler['animationframe']);
@@ -112,13 +141,13 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
 
       const currActive = document.querySelector('.ui-nav-item.active');
       const currPrevActive = document.querySelector('.ui-nav-item.prev-active');
-      if (currActive === navItem) return;
+      if (currActive === navItem) { return; }
 
-      currActive && currActive.classList.remove('active');
-      currPrevActive && currPrevActive.classList.remove('prev-active');
+      if (currActive) { currActive.classList.remove('active'); }
+      if (currPrevActive) { currPrevActive.classList.remove('prev-active'); }
 
       navItem.classList.add('active');
-      prevNavItem && prevNavItem.classList.add('prev-active');
+      if (prevNavItem) { prevNavItem.classList.add('prev-active'); }
     };
 
     const state$ = action$.pipe(
@@ -129,7 +158,7 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
 
     state$.subscribe((state: AppState) => {
       const end = state.type === 'panend';
-
+      console.log(state);
       if (end) {
         nativeNavItems.forEach(item => this.RxCSS.set(item, { delta: { top: 0, left: 0 } }));
       }
@@ -154,7 +183,7 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
         nativeApp.removeAttribute('data-pending');
       }
 
-      if (state.n) setNthItemClass(state.n);
+      if (state.n) { setNthItemClass(state.n); }
 
       const px = state.dx / appRect.width;
       this.RxCSS.set(document.body, {
@@ -184,16 +213,16 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
       'panstart': true,
       'panend': false,
     }[action.type];
-    if (panning === undefined) panning = state.panning;
+    if (panning === undefined) { panning = state.panning; }
 
     if (action.type === 'panstart' && state.appState === 'START') {
       return {
         ...state,
         n: action.key,
         direction: 'y',
-      }
+      };
     }
-    
+
     if (!state.pending && (action.type === 'panup' || action.type === 'pandown') && state.direction !== 'x') {
       return {
         ...state,
@@ -203,7 +232,7 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
         pending: true,
         panning: true,
         changed: true,
-      }
+      };
     }
 
     if (state.pending && (action.type === 'panup' || action.type === 'pandown')) {
@@ -244,7 +273,7 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
         panning: false,
         changed: false,
         direction: undefined,
-      } as AppState
+      } as AppState;
     }
 
     const direction = action.type === 'panend'
@@ -273,6 +302,6 @@ export class SwipeablePagesComponent implements OnInit, AfterViewInit {
       dy: (action.type === 'panend' || direction === 'x')
         ? 0
         : action.deltaY || state.dy,
-    }
+    };
   }
 }

@@ -106,8 +106,9 @@ export class TaskListComponent implements OnInit, AfterViewInit {
                     });
                     if (this.fakeInput) {
                         console.log('Focussing ...');
+                        const focus = () => this.fakeInput.nativeElement.focus();
                         this.zone.runOutsideAngular(() => {
-                            this.fakeInput.nativeElement.focus();
+                            setTimeout(() => focus());
                         });
                     }
                     this.slideToEdit()
