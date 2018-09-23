@@ -5,24 +5,9 @@
       <div class="ui-icon -search"></div>
     </div>
     <ul class="ui-nav-items">
-      <li class="ui-nav-item" data-key="1" #uiNavItem>
+      <li class="ui-nav-item" *ngFor="let title of titles; let i = index" [attr.data-key]="i" #uiNavItem>
         <div class="ui-nav-item-title">
-          <span>Highlights</span>
-        </div>
-      </li>
-      <li class="ui-nav-item" data-key="2" #uiNavItem>
-        <div class="ui-nav-item-title">
-          <span>Science</span>
-        </div>
-      </li>
-      <li class="ui-nav-item" data-key="3" #uiNavItem>
-        <div class="ui-nav-item-title">
-          <span>Gaming</span>
-        </div>
-      </li>
-      <li class="ui-nav-item" data-key="4" #uiNavItem>
-        <div class="ui-nav-item-title">
-          <span>Movies</span>
+          <span>{{title}}</span>
         </div>
       </li>
     </ul>
@@ -32,139 +17,9 @@
       <span class="ui-filter">Popular</span>
       <span class="ui-filter">This Week</span>
     </header>
-    <div class="ui-articles">
-      <article class="ui-article" data-article="1">
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="3k" data-days="5">
-            These Goats Are Pretty Cool
-          </div>
-        </header>
-        <div class="ui-content">
-          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/181794/Screen%20Shot%202017-04-23%20at%2011.00.36%20PM.png" alt="" class="ui-photo">
-        </div>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="564" data-days="10">
-            Facebook now reads people's minds
-          </div>
-        </header>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="808" data-days="8">
-            What did Uber do this time?
-          </div>
-        </header>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="552" data-days="2">
-            Meteor shower to occur Friday night
-          </div>
-        </header>
-      </article>
-
-      <article class="ui-article" data-article="2">
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="3k" data-days="5">
-            Jellyfish Cam Offers Stunning Views
-          </div>
-        </header>
-        <div class="ui-content">
-          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/181794/Screen%20Shot%202017-04-21%20at%2012.49.25%20AM.png" alt="" class="ui-photo">
-        </div>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="564" data-days="10">
-            Oculus Rift and VR
-          </div>
-        </header>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="808" data-days="8">
-            Your favorite gadgets ever
-          </div>
-        </header>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="552" data-days="2">
-            A new planet found near us
-          </div>
-        </header>
-      </article>
-
-      <article class="ui-article" data-article="3">
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="3k" data-days="5">
-            Project Microsoft Hololens
-          </div>
-        </header>
-        <div class="ui-content">
-          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/181794/Screen%20Shot%202017-04-24%20at%2012.49.31%20AM.png" alt="" class="ui-photo">
-        </div>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="564" data-days="10">
-            Oculus Rift and Minecraft
-          </div>
-        </header>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="808" data-days="8">
-            Your favorite games ever
-          </div>
-        </header>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="552" data-days="2">
-            Jak and Daxter reboot
-          </div>
-        </header>
-      </article>
-
-      <article class="ui-article" data-article="4">
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="3k" data-days="5">
-            Silicon Valley Sparks Debate
-          </div>
-        </header>
-        <div class="ui-content">
-          <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/181794/Screen%20Shot%202017-04-23%20at%2011.06.31%20PM.png" alt="" class="ui-photo">
-        </div>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="564" data-days="10">
-            Fast and Furious needs to slow down
-          </div>
-        </header>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="808" data-days="8">
-            Deadpool sequel might not suck
-          </div>
-        </header>
-        <header class="ui-header">
-          <div class="ui-thumbnail"></div>
-          <div class="ui-title" data-views="552" data-days="2">
-            Why are you reading these?
-          </div>
-        </header>
-      </article>
+    <div class="ui-articles" id="articles-container">
+      <ng-content></ng-content>
     </div>
   </div>
   <div class="ui-fab"></div>
 </div>
-<svg class="ui-gradient" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 100 100" version="1.1" style="
-  height: 100vh;
-  width: 100vw;
-">
-  <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop stop-color="var(--gradient-0)" offset="0%"></stop>
-      <stop stop-color="var(--gradient-1)" offset="100%"></stop>
-    </linearGradient>
-  </defs>
-  <rect x="0" y="0" width="100" height="100" fill="url(#gradient)"></rect>
-</svg>

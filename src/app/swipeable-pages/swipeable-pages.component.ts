@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit, ViewChild, ViewChildren, AfterViewInit } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild, ViewChildren, AfterViewInit, Input } from '@angular/core';
 import { Scheduler, interval, fromEventPattern, merge } from 'rxjs';
 import { map, startWith, scan, share } from 'rxjs/operators';
 import { AppState } from '../app-state';
@@ -9,18 +9,11 @@ import { AppState } from '../app-state';
   styleUrls: ['./swipeable-pages.component.scss']
 })
 export class SwipeablePagesComponent implements OnInit, AfterViewInit {
-  title = 'flip-animation';
+  @Input() titles: string[];
+  @Input() colors: string[];
   @ViewChild('app') app;
   @ViewChild('uiNav') nav;
   @ViewChildren('uiNavItem') navItems;
-
-  colors = {
-    0: ['#992fc7', '#6b0f93'],
-    1: ['#b963df', '#6b0f93'],
-    2: ['#FB2474', '#934CDB'],
-    3: ['#FB9C2C', '#FD2472'],
-    4: ['#D8D6CD', '#FD9722'],
-  };
 
   /* machine = {
     START: {

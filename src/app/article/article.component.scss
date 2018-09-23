@@ -1,0 +1,42 @@
+
+
+@mixin transition-when-not-panning ($prop: all, $duration: 0.3s) {
+  transition: $prop calc(var(--not-panning) * #{$duration}) ease-out;
+  transition-property: transform, opacity;
+}
+
+.ui-article {
+  flex-basis: 100%;
+  flex-grow: 1;
+  flex-shrink: 0;
+}
+
+.ui-article {
+    padding: 1rem;
+  
+    &, * {
+      user-select: none;
+    }
+  
+    > .ui-header {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
+  
+    .ui-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      line-height: 1.2rem;
+      font-weight: 500;
+  
+      &:after {
+        font-size: 0.75rem;
+        line-height: 1.2rem;
+        content: attr(data-views) ' views · ' attr(data-days) ' days';
+        display: block;
+        color: #BABABA;
+      }
+    }
+  }

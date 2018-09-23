@@ -12,10 +12,14 @@ import { itemReducer, colorReducer, editReducer } from './swipe-task/swipe-task-
 import { TaskListComponent } from './swipe-task/task-list.component';
 import { TaskItemComponent } from './swipe-task/task-item';
 import { TaskInputComponent } from './swipe-task/task-input';
+import { SwipeablePagesConsumerComponent } from './swipeable-pages-consumer/swipeable-pages-consumer.component';
+import { MoviesComponent } from './movies/movies.component';
+import { ArticleComponent } from './article/article.component';
 
 export const appRoutes: Routes = [
   { path: 'swipe-card', component: SwipeableCardsComponent },
   { path: 'swipe-page', component: SwipeablePagesComponent },
+  { path: 'swipe-page-consumer', component: SwipeablePagesConsumerComponent },
   { path: 'drag-rx', component: RxjsDragComponent },
   { path: 'swipe-rx', component: SwipeTaskComponent }
 ];
@@ -29,7 +33,10 @@ export const appRoutes: Routes = [
     SwipeTaskComponent,
     TaskListComponent,
     TaskItemComponent,
-    TaskInputComponent
+    TaskInputComponent,
+    SwipeablePagesConsumerComponent,
+    MoviesComponent,
+    ArticleComponent
   ],
   imports: [
     BrowserModule,
